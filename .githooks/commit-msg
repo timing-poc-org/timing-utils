@@ -6,11 +6,31 @@ commit_message_file=$1
 # Extract the very first line (the subject line/title)
 subject_line=$(head -1 "$commit_message_file")
 
+
+# Skip validation for auto-generated merge commits from `git merge`, `git pull` or GitHub's "Update branch" button.
+# These aren't hand-authored and don't follow Conventional Commits format by design.
+case "$subject_line" in
+  "Merge "*)
+    echo "🟡 Merge commit detected — skipping subject line validation"
+    exit 0
+    ;;
+esac
+
 subject_length=${#subject_line}
 
 if [ "$subject_length" -gt 70 ]; then
   echo "🔴 Commit rejected: subject line is $subject_length characters (limit: 70, excess: $((subject_length - 70)))"
   exit 1
 fi
+
+pattern="^(feat|fix|chore|docs|test|refactor|perf|ci|build|revert)(\([a-z0-9_-]+\))?: [^ ].*"
+
+if ! echo "$subject_line" | grep -qE "$pattern"; then
+  echo "🔴 Commit rejected: subject line must follow Conventional Commits format"
+  echo "    Expected: <type>: <description>  (e.g. \"chore: add commit hook\")"
+  echo "    Valid types: feat, fix, chore, docs, test, refactor, perf, ci, build, revert"
+  exit 1
+fi
+
 # IntelliJ IDEA does not show this but terminal does
 echo "🟢 Commit accepted: subject line length is within limit ($subject_length characters)"
