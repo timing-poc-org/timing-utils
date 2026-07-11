@@ -5,7 +5,4 @@
 **A focused, light weight, minimal-external-dependency Java library for measuring method execution time for deliberate
 performance investigations *and* permanent production logging.**
 
-**A focused, light weight, minimal-external-dependency Java library for measuring method execution time for deliberate
-performance investigations *and* permanent production logging.**
-
 </div>
